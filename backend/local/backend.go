@@ -19,8 +19,8 @@ import (
 )
 
 const (
-	DefaultEnvDir          = "terraform.tfstate.d"
-	DefaultEnvFile         = "environment"
+	DefaultWorkspaceDir    = "terraform.tfstate.d"
+	DefaultWorkspaceFile   = "environment"
 	DefaultStateFilename   = "terraform.tfstate"
 	DefaultDataDir         = ".terraform"
 	DefaultBackupExtension = ".backup"
@@ -35,8 +35,8 @@ type Local struct {
 	CLI      cli.Ui
 	CLIColor *colorstring.Colorize
 
-	// The State* paths are set from the CLI options, and may be left blank to
-	// use the defaults. If the actual paths for the local backend state are
+	// The State* paths are set from the backend config, and may be left blank
+	// to use the defaults. If the actual paths for the local backend state are
 	// needed, use the StatePaths method.
 	//
 	// StatePath is the local path where state is read from.
@@ -47,12 +47,12 @@ type Local struct {
 	// StateBackupPath is the local path where a backup file will be written.
 	// Set this to "-" to disable state backup.
 	//
-	// StateEnvPath is the path to the folder containing environments. This
-	// defaults to DefaultEnvDir if not set.
-	StatePath       string
-	StateOutPath    string
-	StateBackupPath string
-	StateEnvDir     string
+	// StateWorkspaceDir is the path to the folder containing environments.
+	// This defaults to DefaultEnvDir if not set.
+	StatePath         string
+	StateOutPath      string
+	StateBackupPath   string
+	StateWorkspaceDir string
 
 	// We only want to create a single instance of a local state, so store them
 	// here as they're loaded.
@@ -329,7 +329,7 @@ func (b *Local) schemaConfigure(ctx context.Context) error {
 	if raw, ok := d.GetOk("workspace_dir"); ok {
 		path := raw.(string)
 		if path != "" {
-			b.StateEnvDir = path
+			b.StateWorkspaceDir = path
 		}
 	}
 
@@ -337,7 +337,7 @@ func (b *Local) schemaConfigure(ctx context.Context) error {
 	if raw, ok := d.GetOk("environment_dir"); ok {
 		path := raw.(string)
 		if path != "" {
-			b.StateEnvDir = path
+			b.StateWorkspaceDir = path
 		}
 	}
 
@@ -401,9 +401,9 @@ func (b *Local) createState(name string) error {
 
 // stateEnvDir returns the directory where state environments are stored.
 func (b *Local) stateEnvDir() string {
-	if b.StateEnvDir != "" {
-		return b.StateEnvDir
+	if b.StateWorkspaceDir != "" {
+		return b.StateWorkspaceDir
 	}
 
-	return DefaultEnvDir
+	return DefaultWorkspaceDir
 }
