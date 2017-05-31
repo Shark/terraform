@@ -162,10 +162,8 @@ func resourceDMERecordDelete(d *schema.ResourceData, meta interface{}) error {
 }
 
 func getAll(d *schema.ResourceData, cr map[string]interface{}) error {
+	cr["name"] = d.Get("name")
 
-	if attr, ok := d.GetOk("name"); ok {
-		cr["name"] = attr.(string)
-	}
 	if attr, ok := d.GetOk("type"); ok {
 		cr["type"] = attr.(string)
 	}
